@@ -6,6 +6,7 @@ import requests
 import firebase_admin
 from firebase_admin import credentials, firestore
 import time
+import os
 from concurrent.futures import ThreadPoolExecutor
 
 # Logging-Konfiguration
@@ -13,7 +14,8 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 
 # Firebase initialisieren
 try:
-    cred = credentials.Certificate("shop-65d2e-firebase-adminsdk-3no14-788e52577c.json")
+    # Lade die Firebase-API-Schlüssel aus einer Umgebungsvariable
+    cred = credentials.Certificate(os.getenv("FIREBASE_CREDENTIALS_JSON"))
     firebase_admin.initialize_app(cred)
     db = firestore.client()
     logging.info("Erfolgreich mit Firestore verbunden.")
