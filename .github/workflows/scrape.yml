@@ -1,0 +1,45 @@
+name: Product Scraping
+
+on:
+  # Manuelle Auslösung
+  workflow_dispatch:
+
+  # Automatische Auslösung alle 45 Minuten
+  schedule:
+    - cron: '*/45 * * * *'
+
+jobs:
+  scrape_products:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout des Repositories
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Setup für Python 3.x
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      # Installiere die Abhängigkeiten
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Stelle sicher, dass ChromeDriver und Selenium verfügbar sind
+      - name: Setup ChromeDriver
+        uses: bromix/chromium-chromedriver-action@v1
+        with:
+          chromedriver-version: '115.0.5790.102'
+
+      # Setze Firebase API Schlüssel als Umgebungsvariable
+      - name: Set Firebase credentials
+        run: echo "FIREBASE_CREDENTIALS_JSON=${{ secrets.FIREBASE_CREDENTIALS_JSON }}" >> $GITHUB_ENV
+
+      # Führe das Scraping-Skript aus
+      - name: Run scraper
+        run: |
+          python scrape_script.py
